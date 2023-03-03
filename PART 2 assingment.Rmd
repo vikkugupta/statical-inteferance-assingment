@@ -1,0 +1,91 @@
+---
+title: "Data Analysis the ToothGrow dataset"
+output: html_document
+date: "2023-03-03"
+---
+
+## Overview 
+We load the 'ToothGrowth'data set from the datasets package in R, use the same to first perform an exploratory analysis and then use confidence intervals and hypothesis tests to compare tooth growth by supp and dose.
+
+## Loading DATA 
+
+First we load the ToothGrowth dataset and use str and summary functions to gather basic summary about the dataset. 
+
+
+```{r}
+data("ToothGrowth")
+dt <- ToothGrowth
+```
+
+# Basic expolatory data analysis 
+
+```{r}
+str(dt)
+summary(dt)
+
+```
+
+```{r}
+unique(dt$dose)
+dt$dose <- factor(dt$dose)
+str(dt)
+```
+
+## Ploting box plot 
+```{r}
+library(ggplot2)
+ggplot(dt, aes(x = dose, y = len, fill = supp)) +
+    geom_boxplot() +
+    ggtitle("Length of tooth growth based on supplement type and dose") +
+    theme_classic()
+```
+
+from the box plot, we can observe that the dosage for 0.5 and 1.0 has bigger differences in length as compared to the dosage for 2.0 mg/day. We can see a trend as the dose increases, the tooth length increases as well. Moreover, from the plot alone, we can tell supplement OJ is more effective for doses 0.5 and 1.0, where as for dose 2, there’s not much difference between them.
+
+# Assumption
+
+or the further analysis we assume that the ToothGrowth data follows normal distribution and also no other factors affect tooth growth other than dose and supp.
+
+## HypoThesis Testing
+we would test three different hypothesis stating for a dose of ( 0.5 or 1 or 2 ) mg/day both supp deliver same growth. 
+
+# Test for 0.5 mg/day 
+ 
+```{r}
+t.test(len ~ supp, data = subset( dt, dose == 0.5))
+```
+
+
+# Test for 1 mg/day 
+ 
+```{r}
+t.test(len ~ supp, data = subset( dt, dose == 1))
+```
+
+# Test for 2.0 mg/day 
+ 
+```{r}
+t.test(len ~ supp, data = subset( dt, dose == 2.0))
+```
+
+
+# Forming a table to summarize the t.test results
+
+```{r}
+dose <- c(0.5, 1.0, 2.0)
+p_value <- c(0.0064, 0.0010, 0.9639)
+conf.int <- c("1.72, 8.78", "2.80, 9.06", "-3.80, 3.64")
+decision <- c("Reject null", "Reject null", "Do not reject null")
+data.frame(dose, conf.int, p_value, decision)
+```
+
+## Conclusion 
+
+The central assumption for the results is that the sample is representative of the population, and the variables are IID random variables.
+
+For the t.test, two assumptions are made,
+
+The data isn’t paired, meaning they’re independent
+The variance are different.
+With that, in reviewing the t.test, supplement type OC are more effective than VC for doses less than 1.0. But for dose at 2.0 mg/day, there is no difference between the supplement types.
+
